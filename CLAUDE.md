@@ -6,12 +6,18 @@ This project creates Go bindings for the libvips image library. The vipsgen tool
 
 ## Commands
 
-Build static libs and generate bindings: `./generate-vips-bindings.sh`
+Build static libs and generate bindings:
+`./generate-vips-bindings.sh`
 
-## Overview
+Compile with static linking:
+`./with-static.sh go build`
+`./with-static.sh go test`
+
+## Key files
 
 - `vips/` - Generated bindings (do not edit)
 - `prebuilt/linux-amd64/` - Static libvips libraries
 - `generate-vips-bindings.sh` - Rebuilds everything using Docker
+- `with-static.sh` - Compiles with static libvips using Zig
 
 The vipsgen tool reads libvips C headers to create the generated code.
