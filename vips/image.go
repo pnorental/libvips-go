@@ -601,6 +601,145 @@ func NewGrey(width int, height int, options *GreyOptions) (*Image, error) {
 	return newImageRef(vipsImage, ImageTypeUnknown, nil), nil
 }
 
+// HeifloadOptions optional arguments for vips_heifload
+type HeifloadOptions struct {
+	// Page First page to load
+	Page int
+	// N Number of pages to load, -1 for all
+	N int
+	// Thumbnail Fetch thumbnail image
+	Thumbnail bool
+	// Unlimited Remove all denial of service limits
+	Unlimited bool
+	// Memory Force open via memory
+	Memory bool
+	// Access Required access pattern for this file
+	Access Access
+	// FailOn Error level to fail on
+	FailOn FailOn
+	// Revalidate Don't use a cached result for this operation
+	Revalidate bool
+}
+
+// DefaultHeifloadOptions creates default value for vips_heifload optional arguments
+func DefaultHeifloadOptions() *HeifloadOptions {
+	return &HeifloadOptions{
+		N: 1,
+	}
+}
+
+// NewHeifload vips_heifload load a HEIF image
+//
+// The filename specifies filename to load from.
+func NewHeifload(filename string, options *HeifloadOptions) (*Image, error) {
+	Startup(nil)
+	if options != nil {
+		vipsImage, err := vipsgenHeifloadWithOptions(filename, options.Page, options.N, options.Thumbnail, options.Unlimited, options.Memory, options.Access, options.FailOn, options.Revalidate)
+		if err != nil {
+			return nil, err
+		}
+		return newImageRef(vipsImage, ImageTypeHeif, nil), nil
+	}
+	vipsImage, err := vipsgenHeifload(filename)
+	if err != nil {
+		return nil, err
+	}
+	return newImageRef(vipsImage, ImageTypeHeif, nil), nil
+}
+
+// HeifloadBufferOptions optional arguments for vips_heifload_buffer
+type HeifloadBufferOptions struct {
+	// Page First page to load
+	Page int
+	// N Number of pages to load, -1 for all
+	N int
+	// Thumbnail Fetch thumbnail image
+	Thumbnail bool
+	// Unlimited Remove all denial of service limits
+	Unlimited bool
+	// Memory Force open via memory
+	Memory bool
+	// Access Required access pattern for this file
+	Access Access
+	// FailOn Error level to fail on
+	FailOn FailOn
+	// Revalidate Don't use a cached result for this operation
+	Revalidate bool
+}
+
+// DefaultHeifloadBufferOptions creates default value for vips_heifload_buffer optional arguments
+func DefaultHeifloadBufferOptions() *HeifloadBufferOptions {
+	return &HeifloadBufferOptions{
+		N: 1,
+	}
+}
+
+// NewHeifloadBuffer vips_heifload_buffer load a HEIF image
+func NewHeifloadBuffer(buf []byte, options *HeifloadBufferOptions) (*Image, error) {
+	Startup(nil)
+	if len(buf) == 0 {
+		return nil, fmt.Errorf("heifload_buffer: buffer is empty")
+	}
+	if options != nil {
+		vipsImage, err := vipsgenHeifloadBufferWithOptions(buf, options.Page, options.N, options.Thumbnail, options.Unlimited, options.Memory, options.Access, options.FailOn, options.Revalidate)
+		if err != nil {
+			return nil, err
+		}
+		return newImageRef(vipsImage, ImageTypeHeif, buf), nil
+	}
+	vipsImage, err := vipsgenHeifloadBuffer(buf)
+	if err != nil {
+		return nil, err
+	}
+	return newImageRef(vipsImage, ImageTypeHeif, buf), nil
+}
+
+// HeifloadSourceOptions optional arguments for vips_heifload_source
+type HeifloadSourceOptions struct {
+	// Page First page to load
+	Page int
+	// N Number of pages to load, -1 for all
+	N int
+	// Thumbnail Fetch thumbnail image
+	Thumbnail bool
+	// Unlimited Remove all denial of service limits
+	Unlimited bool
+	// Memory Force open via memory
+	Memory bool
+	// Access Required access pattern for this file
+	Access Access
+	// FailOn Error level to fail on
+	FailOn FailOn
+	// Revalidate Don't use a cached result for this operation
+	Revalidate bool
+}
+
+// DefaultHeifloadSourceOptions creates default value for vips_heifload_source optional arguments
+func DefaultHeifloadSourceOptions() *HeifloadSourceOptions {
+	return &HeifloadSourceOptions{
+		N: 1,
+	}
+}
+
+// NewHeifloadSource vips_heifload_source load a HEIF image
+//
+// The source specifies source to load from.
+func NewHeifloadSource(source *Source, options *HeifloadSourceOptions) (*Image, error) {
+	Startup(nil)
+	if options != nil {
+		vipsImage, err := vipsgenHeifloadSourceWithOptions(source.src, options.Page, options.N, options.Thumbnail, options.Unlimited, options.Memory, options.Access, options.FailOn, options.Revalidate)
+		if err != nil {
+			return nil, err
+		}
+		return newImageRef(vipsImage, ImageTypeHeif, nil), nil
+	}
+	vipsImage, err := vipsgenHeifloadSource(source.src)
+	if err != nil {
+		return nil, err
+	}
+	return newImageRef(vipsImage, ImageTypeHeif, nil), nil
+}
+
 // IdentityOptions optional arguments for vips_identity
 type IdentityOptions struct {
 	// Bands Number of bands in LUT
@@ -4078,6 +4217,166 @@ func (r *Image) Grid(tileHeight int, across int, down int) (error) {
 		return err
 	}
 	r.setImage(out)
+	return nil
+}
+
+// HeifsaveOptions optional arguments for vips_heifsave
+type HeifsaveOptions struct {
+	// Q Q factor
+	Q int
+	// Bitdepth Number of bits per pixel
+	Bitdepth int
+	// Lossless Enable lossless compression
+	Lossless bool
+	// Compression Compression format
+	Compression HeifCompression
+	// Effort CPU effort
+	Effort int
+	// SubsampleMode Select chroma subsample operation mode
+	SubsampleMode Subsample
+	// Encoder Select encoder to use
+	Encoder HeifEncoder
+	// Keep Which metadata to retain
+	Keep Keep
+	// Background Background value
+	Background []float64
+	// PageHeight Set page height for multipage save
+	PageHeight int
+	// Profile Filename of ICC profile to embed
+	Profile string
+}
+
+// DefaultHeifsaveOptions creates default value for vips_heifsave optional arguments
+func DefaultHeifsaveOptions() *HeifsaveOptions {
+	return &HeifsaveOptions{
+		Q: 50,
+		Bitdepth: 12,
+		Compression: HeifCompression(1),
+		Effort: 4,
+	}
+}
+
+// Heifsave vips_heifsave save image in HEIF format
+//
+// The filename specifies filename to save to.
+func (r *Image) Heifsave(filename string, options *HeifsaveOptions) (error) {
+	if options != nil {
+		err := vipsgenHeifsaveWithOptions(r.image, filename, options.Q, options.Bitdepth, options.Lossless, options.Compression, options.Effort, options.SubsampleMode, options.Encoder, options.Keep, options.Background, options.PageHeight, options.Profile)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	err := vipsgenHeifsave(r.image, filename)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// HeifsaveBufferOptions optional arguments for vips_heifsave_buffer
+type HeifsaveBufferOptions struct {
+	// Q Q factor
+	Q int
+	// Bitdepth Number of bits per pixel
+	Bitdepth int
+	// Lossless Enable lossless compression
+	Lossless bool
+	// Compression Compression format
+	Compression HeifCompression
+	// Effort CPU effort
+	Effort int
+	// SubsampleMode Select chroma subsample operation mode
+	SubsampleMode Subsample
+	// Encoder Select encoder to use
+	Encoder HeifEncoder
+	// Keep Which metadata to retain
+	Keep Keep
+	// Background Background value
+	Background []float64
+	// PageHeight Set page height for multipage save
+	PageHeight int
+	// Profile Filename of ICC profile to embed
+	Profile string
+}
+
+// DefaultHeifsaveBufferOptions creates default value for vips_heifsave_buffer optional arguments
+func DefaultHeifsaveBufferOptions() *HeifsaveBufferOptions {
+	return &HeifsaveBufferOptions{
+		Q: 50,
+		Bitdepth: 12,
+		Compression: HeifCompression(1),
+		Effort: 4,
+	}
+}
+
+// HeifsaveBuffer vips_heifsave_buffer save image in HEIF format
+func (r *Image) HeifsaveBuffer(options *HeifsaveBufferOptions) ([]byte, error) {
+	if options != nil {
+		buf, err := vipsgenHeifsaveBufferWithOptions(r.image, options.Q, options.Bitdepth, options.Lossless, options.Compression, options.Effort, options.SubsampleMode, options.Encoder, options.Keep, options.Background, options.PageHeight, options.Profile)
+		if err != nil {
+			return nil, err
+		}
+		return buf, nil
+	}
+	buf, err := vipsgenHeifsaveBuffer(r.image)
+	if err != nil {
+		return nil, err
+	}
+	return buf, nil
+}
+
+// HeifsaveTargetOptions optional arguments for vips_heifsave_target
+type HeifsaveTargetOptions struct {
+	// Q Q factor
+	Q int
+	// Bitdepth Number of bits per pixel
+	Bitdepth int
+	// Lossless Enable lossless compression
+	Lossless bool
+	// Compression Compression format
+	Compression HeifCompression
+	// Effort CPU effort
+	Effort int
+	// SubsampleMode Select chroma subsample operation mode
+	SubsampleMode Subsample
+	// Encoder Select encoder to use
+	Encoder HeifEncoder
+	// Keep Which metadata to retain
+	Keep Keep
+	// Background Background value
+	Background []float64
+	// PageHeight Set page height for multipage save
+	PageHeight int
+	// Profile Filename of ICC profile to embed
+	Profile string
+}
+
+// DefaultHeifsaveTargetOptions creates default value for vips_heifsave_target optional arguments
+func DefaultHeifsaveTargetOptions() *HeifsaveTargetOptions {
+	return &HeifsaveTargetOptions{
+		Q: 50,
+		Bitdepth: 12,
+		Compression: HeifCompression(1),
+		Effort: 4,
+	}
+}
+
+// HeifsaveTarget vips_heifsave_target save image in HEIF format
+//
+// The target specifies target to save to.
+func (r *Image) HeifsaveTarget(target *Target, options *HeifsaveTargetOptions) (error) {
+	if options != nil {
+		err := vipsgenHeifsaveTargetWithOptions(r.image, target.target, options.Q, options.Bitdepth, options.Lossless, options.Compression, options.Effort, options.SubsampleMode, options.Encoder, options.Keep, options.Background, options.PageHeight, options.Profile)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	err := vipsgenHeifsaveTarget(r.image, target.target)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

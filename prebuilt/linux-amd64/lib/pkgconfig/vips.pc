@@ -5,5 +5,5 @@ libdir=${prefix}/lib
 Name: vips
 Description: Image processing library
 Version: 8.16.1
-Libs: -L${libdir} -lvips -lglib-2.0 -lgio-2.0 -lgobject-2.0 -lgmodule-2.0 -lintl -lffi -lpcre2-8 -lz -lmount -lblkid -leconf -lexpat -ljpeg -lpng16 -lwebp -lsharpyuv -lwebpmux -lwebpdemux -lzstd -pthread -lm
+Libs: -L${libdir} -lvips -lglib-2.0 -lgio-2.0 -lgobject-2.0 -lgmodule-2.0 -lintl -lffi -lpcre2-8 -lz -lmount -lblkid -leconf -lexpat -ljpeg -lpng16 -lwebp -lsharpyuv -lwebpmux -lwebpdemux -lheif -lde265 -lzstd -lstdc++ -pthread -lm
 Cflags: -I${includedir} -DHAVE_CONFIG_H=1 -pthread

@@ -268,6 +268,24 @@ int vipsgen_grey_with_options(VipsImage** out, int width, int height, gboolean u
 
 int vipsgen_grid(VipsImage* in, VipsImage** out, int tile_height, int across, int down);
 
+int vipsgen_heifload(const char* filename, VipsImage** out);
+int vipsgen_heifload_with_options(const char* filename, VipsImage** out, int page, int n, gboolean thumbnail, gboolean unlimited, gboolean memory, VipsAccess access, VipsFailOn fail_on, gboolean revalidate);
+
+int vipsgen_heifload_buffer(void* buf, size_t len, VipsImage** out);
+int vipsgen_heifload_buffer_with_options(void* buf, size_t len, VipsImage** out, int page, int n, gboolean thumbnail, gboolean unlimited, gboolean memory, VipsAccess access, VipsFailOn fail_on, gboolean revalidate);
+
+int vipsgen_heifload_source(VipsSourceCustom* source, VipsImage** out);
+int vipsgen_heifload_source_with_options(VipsSourceCustom* source, VipsImage** out, int page, int n, gboolean thumbnail, gboolean unlimited, gboolean memory, VipsAccess access, VipsFailOn fail_on, gboolean revalidate);
+
+int vipsgen_heifsave(VipsImage* in, const char* filename);
+int vipsgen_heifsave_with_options(VipsImage* in, const char* filename, int Q, int bitdepth, gboolean lossless, VipsForeignHeifCompression compression, int effort, VipsForeignSubsample subsample_mode, VipsForeignHeifEncoder encoder, VipsForeignKeep keep, double* background, int background_n, int page_height, const char* profile);
+
+int vipsgen_heifsave_buffer(VipsImage* in, void** buf, size_t* len);
+int vipsgen_heifsave_buffer_with_options(VipsImage* in, void** buf, size_t* len, int Q, int bitdepth, gboolean lossless, VipsForeignHeifCompression compression, int effort, VipsForeignSubsample subsample_mode, VipsForeignHeifEncoder encoder, VipsForeignKeep keep, double* background, int background_n, int page_height, const char* profile);
+
+int vipsgen_heifsave_target(VipsImage* in, VipsTargetCustom* target);
+int vipsgen_heifsave_target_with_options(VipsImage* in, VipsTargetCustom* target, int Q, int bitdepth, gboolean lossless, VipsForeignHeifCompression compression, int effort, VipsForeignSubsample subsample_mode, VipsForeignHeifEncoder encoder, VipsForeignKeep keep, double* background, int background_n, int page_height, const char* profile);
+
 int vipsgen_hist_cum(VipsImage* in, VipsImage** out);
 
 int vipsgen_hist_entropy(VipsImage* in, double* out);

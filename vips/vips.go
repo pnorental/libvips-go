@@ -1595,6 +1595,154 @@ func vipsgenGrid(in *C.VipsImage, tileHeight int, across int, down int) (*C.Vips
 	return out, nil
 }
 
+// vipsgenHeifload vips_heifload load a HEIF image
+func vipsgenHeifload(filename string) (*C.VipsImage, error) {
+	var out *C.VipsImage
+	cfilename := C.CString(filename)
+	defer freeCString(cfilename)
+	if err := C.vipsgen_heifload(cfilename, &out); err != 0 {
+		return nil, handleImageError(out)
+	}
+	return out, nil
+}
+
+// vipsgenHeifloadWithOptions vips_heifload load a HEIF image with optional arguments
+func vipsgenHeifloadWithOptions(filename string, page int, n int, thumbnail bool, unlimited bool, memory bool, access Access, failOn FailOn, revalidate bool) (*C.VipsImage, error) {
+	var out *C.VipsImage
+	cfilename := C.CString(filename)
+	defer freeCString(cfilename)
+	if err := C.vipsgen_heifload_with_options(cfilename, &out, C.int(page), C.int(n), C.int(boolToInt(thumbnail)), C.int(boolToInt(unlimited)), C.int(boolToInt(memory)), C.VipsAccess(access), C.VipsFailOn(failOn), C.int(boolToInt(revalidate))); err != 0 {
+		return nil, handleImageError(out)
+	}
+	return out, nil
+}
+
+// vipsgenHeifloadBuffer vips_heifload_buffer load a HEIF image
+func vipsgenHeifloadBuffer(buf []byte) (*C.VipsImage, error) {
+	src := buf
+	// Reference src here so it's not garbage collected during image initialization.
+	defer runtime.KeepAlive(src)
+	var out *C.VipsImage
+	if err := C.vipsgen_heifload_buffer(unsafe.Pointer(&src[0]), C.size_t(len(src)), &out); err != 0 {
+		return nil, handleImageError(out)
+	}
+	return out, nil
+}
+
+// vipsgenHeifloadBufferWithOptions vips_heifload_buffer load a HEIF image with optional arguments
+func vipsgenHeifloadBufferWithOptions(buf []byte, page int, n int, thumbnail bool, unlimited bool, memory bool, access Access, failOn FailOn, revalidate bool) (*C.VipsImage, error) {
+	src := buf
+	// Reference src here so it's not garbage collected during image initialization.
+	defer runtime.KeepAlive(src)
+	var out *C.VipsImage
+	if err := C.vipsgen_heifload_buffer_with_options(unsafe.Pointer(&src[0]), C.size_t(len(src)), &out, C.int(page), C.int(n), C.int(boolToInt(thumbnail)), C.int(boolToInt(unlimited)), C.int(boolToInt(memory)), C.VipsAccess(access), C.VipsFailOn(failOn), C.int(boolToInt(revalidate))); err != 0 {
+		return nil, handleImageError(out)
+	}
+	return out, nil
+}
+
+// vipsgenHeifloadSource vips_heifload_source load a HEIF image
+func vipsgenHeifloadSource(source *C.VipsSourceCustom) (*C.VipsImage, error) {
+	var out *C.VipsImage
+	if err := C.vipsgen_heifload_source(source, &out); err != 0 {
+		return nil, handleImageError(out)
+	}
+	return out, nil
+}
+
+// vipsgenHeifloadSourceWithOptions vips_heifload_source load a HEIF image with optional arguments
+func vipsgenHeifloadSourceWithOptions(source *C.VipsSourceCustom, page int, n int, thumbnail bool, unlimited bool, memory bool, access Access, failOn FailOn, revalidate bool) (*C.VipsImage, error) {
+	var out *C.VipsImage
+	if err := C.vipsgen_heifload_source_with_options(source, &out, C.int(page), C.int(n), C.int(boolToInt(thumbnail)), C.int(boolToInt(unlimited)), C.int(boolToInt(memory)), C.VipsAccess(access), C.VipsFailOn(failOn), C.int(boolToInt(revalidate))); err != 0 {
+		return nil, handleImageError(out)
+	}
+	return out, nil
+}
+
+// vipsgenHeifsave vips_heifsave save image in HEIF format
+func vipsgenHeifsave(in *C.VipsImage, filename string) (error) {
+	cfilename := C.CString(filename)
+	defer freeCString(cfilename)
+	if err := C.vipsgen_heifsave(in, cfilename); err != 0 {
+		return handleVipsError()
+	}
+	return nil
+}
+
+// vipsgenHeifsaveWithOptions vips_heifsave save image in HEIF format with optional arguments
+func vipsgenHeifsaveWithOptions(in *C.VipsImage, filename string, q int, bitdepth int, lossless bool, compression HeifCompression, effort int, subsampleMode Subsample, encoder HeifEncoder, keep Keep, background []float64, pageHeight int, profile string) (error) {
+	cfilename := C.CString(filename)
+	defer freeCString(cfilename)
+	cbackground, cbackgroundLength, err := convertToDoubleArray(background)
+	if err != nil {
+		return err
+	}
+	if cbackground != nil {
+		defer freeDoubleArray(cbackground)
+	}
+	cprofile := C.CString(profile)
+	defer freeCString(cprofile)
+	if err := C.vipsgen_heifsave_with_options(in, cfilename, C.int(q), C.int(bitdepth), C.int(boolToInt(lossless)), C.VipsForeignHeifCompression(compression), C.int(effort), C.VipsForeignSubsample(subsampleMode), C.VipsForeignHeifEncoder(encoder), C.VipsForeignKeep(keep), cbackground, cbackgroundLength, C.int(pageHeight), cprofile); err != 0 {
+		return handleVipsError()
+	}
+	return nil
+}
+
+// vipsgenHeifsaveBuffer vips_heifsave_buffer save image in HEIF format
+func vipsgenHeifsaveBuffer(in *C.VipsImage) ([]byte, error) {
+	var buf unsafe.Pointer
+	var length C.size_t
+	if err := C.vipsgen_heifsave_buffer(in, &buf, &length); err != 0 {
+		return nil, handleVipsError()
+	}
+	return bufferToBytes(buf, length), nil
+}
+
+// vipsgenHeifsaveBufferWithOptions vips_heifsave_buffer save image in HEIF format with optional arguments
+func vipsgenHeifsaveBufferWithOptions(in *C.VipsImage, q int, bitdepth int, lossless bool, compression HeifCompression, effort int, subsampleMode Subsample, encoder HeifEncoder, keep Keep, background []float64, pageHeight int, profile string) ([]byte, error) {
+	var buf unsafe.Pointer
+	var length C.size_t
+	cbackground, cbackgroundLength, err := convertToDoubleArray(background)
+	if err != nil {
+		return nil, err
+	}
+	if cbackground != nil {
+		defer freeDoubleArray(cbackground)
+	}
+	cprofile := C.CString(profile)
+	defer freeCString(cprofile)
+	if err := C.vipsgen_heifsave_buffer_with_options(in, &buf, &length, C.int(q), C.int(bitdepth), C.int(boolToInt(lossless)), C.VipsForeignHeifCompression(compression), C.int(effort), C.VipsForeignSubsample(subsampleMode), C.VipsForeignHeifEncoder(encoder), C.VipsForeignKeep(keep), cbackground, cbackgroundLength, C.int(pageHeight), cprofile); err != 0 {
+		return nil, handleVipsError()
+	}
+	return bufferToBytes(buf, length), nil
+}
+
+// vipsgenHeifsaveTarget vips_heifsave_target save image in HEIF format
+func vipsgenHeifsaveTarget(in *C.VipsImage, target *C.VipsTargetCustom) (error) {
+	
+	if err := C.vipsgen_heifsave_target(in, target); err != 0 {
+		return handleVipsError()
+	}
+	return nil
+}
+
+// vipsgenHeifsaveTargetWithOptions vips_heifsave_target save image in HEIF format with optional arguments
+func vipsgenHeifsaveTargetWithOptions(in *C.VipsImage, target *C.VipsTargetCustom, q int, bitdepth int, lossless bool, compression HeifCompression, effort int, subsampleMode Subsample, encoder HeifEncoder, keep Keep, background []float64, pageHeight int, profile string) (error) {
+	cbackground, cbackgroundLength, err := convertToDoubleArray(background)
+	if err != nil {
+		return err
+	}
+	if cbackground != nil {
+		defer freeDoubleArray(cbackground)
+	}
+	cprofile := C.CString(profile)
+	defer freeCString(cprofile)
+	if err := C.vipsgen_heifsave_target_with_options(in, target, C.int(q), C.int(bitdepth), C.int(boolToInt(lossless)), C.VipsForeignHeifCompression(compression), C.int(effort), C.VipsForeignSubsample(subsampleMode), C.VipsForeignHeifEncoder(encoder), C.VipsForeignKeep(keep), cbackground, cbackgroundLength, C.int(pageHeight), cprofile); err != 0 {
+		return handleVipsError()
+	}
+	return nil
+}
+
 // vipsgenHistCum vips_hist_cum form cumulative histogram
 func vipsgenHistCum(in *C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage

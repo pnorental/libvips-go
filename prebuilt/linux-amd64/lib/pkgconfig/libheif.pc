@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libheif
+Description: HEIF file format decoder (static)
+Version: 1.19.5
+Libs: -L${libdir} -lheif -lde265
+Cflags: -I${includedir}

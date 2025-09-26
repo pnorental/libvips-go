@@ -237,6 +237,31 @@ const (
 	FlagsAll Flags = C.VIPS_FOREIGN_ALL
 )
 
+// HeifCompression represents VipsForeignHeifCompression type
+type HeifCompression int
+
+// HeifCompression enum
+const (
+	HeifCompressionHevc HeifCompression = C.VIPS_FOREIGN_HEIF_COMPRESSION_HEVC
+	HeifCompressionAvc HeifCompression = C.VIPS_FOREIGN_HEIF_COMPRESSION_AVC
+	HeifCompressionJpeg HeifCompression = C.VIPS_FOREIGN_HEIF_COMPRESSION_JPEG
+	HeifCompressionAv1 HeifCompression = C.VIPS_FOREIGN_HEIF_COMPRESSION_AV1
+	HeifCompressionLast HeifCompression = C.VIPS_FOREIGN_HEIF_COMPRESSION_LAST
+)
+
+// HeifEncoder represents VipsForeignHeifEncoder type
+type HeifEncoder int
+
+// HeifEncoder enum
+const (
+	HeifEncoderAuto HeifEncoder = C.VIPS_FOREIGN_HEIF_ENCODER_AUTO
+	HeifEncoderAom HeifEncoder = C.VIPS_FOREIGN_HEIF_ENCODER_AOM
+	HeifEncoderRav1e HeifEncoder = C.VIPS_FOREIGN_HEIF_ENCODER_RAV1E
+	HeifEncoderSvt HeifEncoder = C.VIPS_FOREIGN_HEIF_ENCODER_SVT
+	HeifEncoderX265 HeifEncoder = C.VIPS_FOREIGN_HEIF_ENCODER_X265
+	HeifEncoderLast HeifEncoder = C.VIPS_FOREIGN_HEIF_ENCODER_LAST
+)
+
 // Keep represents VipsForeignKeep type
 type Keep int
 
@@ -563,6 +588,9 @@ func vipsDetermineImageType(in *C.VipsImage) ImageType {
 			}
 			if strings.HasPrefix(vipsLoader, "webp") {
 				return ImageTypeWebp
+			}
+			if strings.HasPrefix(vipsLoader, "heif") {
+				return ImageTypeHeif
 			}
 			if strings.HasPrefix(vipsLoader, "analyze") {
 				return ImageTypeAnalyze
