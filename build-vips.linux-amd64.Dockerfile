@@ -5,6 +5,7 @@ RUN apk add --no-cache \
     build-base \
     meson \
     ninja \
+    cmake \
     pkgconfig \
     git \
     # Core dependencies
@@ -42,25 +43,26 @@ ENV PKG_CONFIG="pkg-config --static"
 
 WORKDIR /src
 
+
 # Build libvips statically with Alpine's native static support
 ARG VIPS_VERSION=8.16.1
 RUN wget -q https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz && \
     tar xf vips-${VIPS_VERSION}.tar.xz && \
     cd vips-${VIPS_VERSION} && \
     meson setup builddir \
-        --buildtype=release \
-        --prefix=/usr/local \
-        --libdir=lib \
-        --default-library=static \
-        --prefer-static \
-        -Dintrospection=disabled \
-        -Dmodules=disabled \
-        -Dcplusplus=false \
-        -Ddeprecated=false \
-        -Dexamples=false \
-        -Dvapi=false \
-        -Ddoxygen=false \
-        -Dgtk_doc=false && \
+    --buildtype=release \
+    --prefix=/usr/local \
+    --libdir=lib \
+    --default-library=static \
+    --prefer-static \
+    -Dintrospection=disabled \
+    -Dmodules=disabled \
+    -Dcplusplus=false \
+    -Ddeprecated=false \
+    -Dexamples=false \
+    -Dvapi=false \
+    -Ddoxygen=false \
+    -Dgtk_doc=false && \
     cd builddir && \
     ninja && \
     ninja install && \
@@ -97,11 +99,6 @@ RUN mkdir -p /usr/local/vips-dist && \
     echo "Available headers:" && \
     find /usr/local/vips-dist/include -name "*.h" | wc -l
 
-# Create final stage with only the compiled libraries
 FROM scratch AS artifacts
-
-# Copy the built static libraries, headers, and binaries
 COPY --from=builder /usr/local/vips-dist /usr/local/vips-dist
-
-# Default command (won't be used in scratch, but for documentation)
-CMD ["echo", "Static libvips artifacts with JPEG, PNG, WebP, HEIF support ready"]
+CMD ["echo", "libvips artifacts ready"]
